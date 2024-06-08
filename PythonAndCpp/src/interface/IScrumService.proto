@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package scrum;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+
+message Developer
+{
+    int32 id = 1;
+    fixed32 value = 2;
+    string name = 3;
+}
+
+message ScrumTeam
+{
+    string name = 1;
+}
+
+service Scrum
+{
+    rpc QueryTeam(Developer) returns(ScrumTeam);
+}
