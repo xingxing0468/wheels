@@ -1,4 +1,4 @@
-PROTOC = protoc
+PROTOC = /home/zett/protoc-27_1/bin/protoc
 
 CURR_DIR = $(shell pwd)
 PROTO_PATH = $(CURR_DIR)/src/interface
@@ -13,7 +13,7 @@ PYTHON_SRC_PATH = $(CURR_DIR)/src/python
 
 PROTOS += $(wildcard $(PROTO_PATH)/*.proto)
 
-C_EXTENSION_SO_NAME = zprobe.cpython-36m-x86_64-linux-gnu.so
+C_EXTENSION_SO_NAME = zprobe.cpython-310-x86_64-linux-gnu.so
 
 # NO dependency, build everytime
 all: c_extension_setup interfaces setup_file
@@ -22,7 +22,7 @@ c_extension_setup: c_extension
 	@echo "\033[0;32m[SETUP]\033[m setup_zprobe.py"
 	@python3 setup_zprobe.py  --quiet build_ext --inplace
 	@if [ ! -d $(OUT) ]; then mkdir -p $(OUT); fi;
-	@mv $(C_EXTENSION_SO_NAME) $(OUT)/
+	@mv $(CURR_DIR)/$(C_EXTENSION_SO_NAME) $(OUT)/
 
 
 interfaces:
