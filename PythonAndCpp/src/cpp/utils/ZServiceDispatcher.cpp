@@ -1,11 +1,12 @@
 
 #include "ZServiceDispatcher.h"
-#include "ZServicePackage.h"
-#include "service_factory/ZScrumServiceFactory.h"
-
-#include "google/protobuf/empty.pb.h"
 
 #include <map>
+
+#include "ZServicePackage.h"
+#include "google/protobuf/empty.pb.h"
+#include "service_factory/ZEmServiceFactory.h"
+#include "service_factory/ZScrumServiceFactory.h"
 
 // clang-format off
 
@@ -13,7 +14,8 @@ namespace
 {
   constexpr int MAX_PARAM_SERIALIZED_SIZE = 1024;
   std::map<std::string, IServiceFactory*> ServiceFactories{
-    {std::string("Scrum"), new ZScrumServiceFactory()}
+    {std::string("Scrum"), new ZScrumServiceFactory()},
+    {std::string("Em"), new ZEmServiceFactory()}
   };
 
   std::map<std::string, std::shared_ptr<google::protobuf::Service>> CachedServiceInstances;

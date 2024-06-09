@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package em;
+
+option cc_generic_services = true;
+option py_generic_services = true;
+
+message PointT
+{
+    float x = 1;
+    float y = 2;
+}
+
+enum EmType
+{
+  EMTYPE_UNKNOWN = 0;
+  EMTYPE_CAR = 1;
+  EMTYPE_ROAD = 2;
+  EMTYPE_CURB = 3;
+  EMTYPE_BUILDING = 4;
+}
+
+message EmT
+{
+    PointT position = 1;
+    EmType type = 2;
+}
+
+message FilterInputT
+{
+    repeated EmT ems = 1;
+    EmType type = 2;
+}
+
+message PointCollectionT
+{
+    repeated PointT ret_points = 1;
+}
+
+service Em
+{
+    rpc FilterEnv(FilterInputT) returns(PointCollectionT);
+}
