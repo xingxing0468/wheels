@@ -45,7 +45,7 @@ using EnvCollectionT = std::unordered_map<PointT, EmTypeT, PointTHash>;
 ```
 In Python we are somehow expecting we can call the interface and get the filtered coordinates like:
 ```python
-points = FilterEnv(ems: Dict[PointT, EmTypeT])
+points = FilterEnv(ems: Dict[PointT, EmTypeT], expected_type: EmTypeT)
 for p : points:
   print("Filtered point: [{}, {}]".format(p.x, p.y))
 ```
@@ -70,8 +70,20 @@ The this wheel now is based on the version of:
   - Implement the rpc service calls from the [proto file](src/interface/IEmService.proto), in the [service cpp](src/cpp/service_implementation/ZEmService.cpp), to achieve this, we need to call the existing C++ implementation and fill the data fields one by one.
   - Add a new [service factory](src/cpp/service_factory/ZEmServiceFactory.h) to generate the new protobuf service.
   - Add this new service factory together with a name into global `ServiceFactories` in [service dispatcher](src/cpp/utils/ZServiceDispatcher.cpp)
-
-
+### Python
+  - Directly using Python bindings from protobuf, all the Python API is easily found on [protobuf website](https://googleapis.dev/python/protobuf/latest/).
+  - Take [ZEm](src/python/em/ZEm.py) as a reference.
+  - **NOTE THAT:** Actually Python binding is already a great interface to application developer for all the use-cases, its **NOT** recommanded to have a layer in between to define independent interfaces, implemente the codec between protobuf type and independent type, **HIGHLY RECOMMANDED** that directly program the application based on protobuf because:
+    - Protobuf binded types already supports mature enough APIs, e.g. [I/O](https://googleapis.dev/python/protobuf/latest/google/protobuf/json_format.html), debug, ...
+    - To construct an independent layer already sounds like the beginning for a scalable / well-design product, which violates the design purpose of this wheel, e.g. rapid prototyping. For a scalable / well-design project / product, it has to been evaluate again carefully if Python with C++ approach is a better alternative because latest modern C++ has already been improved quite a lot and becomes more user-friendly.
+### Build
+The build system in this wheel is just a very simple native MAKEFILE based system, a prototype one even without basic dependency/clean-up/rebuilt/... mechanism, only to be used to proove the concept.
+- Set the `protoc` compiler in [Makefile](Makefile).
+- ```shell
+  make
+  source .out/setup.sh
+  ```
+- Now its the time to play with the framework. Please refer to exisiting [trial](trial.py). Happy hacking!
 ## Integration
 
 ## Further development
