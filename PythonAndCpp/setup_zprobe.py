@@ -13,7 +13,8 @@ setup(name='zprobe',
                   ['z_comm.c'],
                   include_dirs=['/usr/include/python3.6'],
                   libraries=['zprobe_impl'],
-                  library_dirs=['./src/cpp/.out']
+                  library_dirs=['./src/cpp/.out'],
+                  extra_compile_args=["-fPIC"]
           )
       ]
       )
