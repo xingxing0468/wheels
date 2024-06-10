@@ -1,0 +1,5 @@
+**/.vscode/*
+PythonAndCpp/**/.*/
+PythonAndCpp/build/*
+PythonAndCpp/**/__pycache__/
+#PythonAndCpp/**/*.o
