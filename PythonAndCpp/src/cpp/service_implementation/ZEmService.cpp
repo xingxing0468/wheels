@@ -17,14 +17,16 @@ void ZEmService::FilterEnv(google::protobuf::RpcController* controller,
   EnvCollectionT es{};
   for (const auto& em : ems) {
     PointT pos{em.position().x(), em.position().y()};
-    es[pos] = static_cast<EmTypeT>(em.type());
+    es.emplace_back(pos, static_cast<EmTypeT>(em.type()));
   }
   const auto ret_ems = FilterE(es, em_type);
 
   for (const auto& ret_em : ret_ems) {
-    response->add_ret_points()->set_x(ret_em.x);
-    response->add_ret_points()->set_y(ret_em.y);
+    auto new_ret_points = response->add_ret_points();
+    new_ret_points->set_x(ret_em.x);
+    new_ret_points->set_y(ret_em.y);
   }
-
+  printf("FilterEnv in CPP, response: \n [%s]\n",
+         response->DebugString().c_str());
   return;
 }

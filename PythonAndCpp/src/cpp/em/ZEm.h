@@ -2,6 +2,7 @@
 #define _Z_EM_H_
 
 #include <cstdint>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -18,17 +19,19 @@ struct PointT {
   bool IsValid() {
     return (x > kMinX) && (x < kMaxX) && (y > kMinY) && (y < kMaxY);
   }
+
+  // TODO
+  bool operator<(const PointT& other) {
+    // return (a.y - b.y) * kScaleFactor < -1.F ||
+    //        ((a.y - b.y) * kScaleFactor);  // TODO
+    return true;
+  };
+
+  // TODO
+  bool operator==(const PointT& other) {
+    return false;  // TODO
+  };
 };
-
-bool operator<(const PointT& a, const PointT& b) {
-  return (a.y - b.y) * kScaleFactor < -1.F ||
-         ((a.y - b.y) * kScaleFactor);  // TODO
-}
-
-// TODO
-bool operator==(const PointT& a, const PointT& b) {
-  return true;  // TODO
-}
 
 struct PointTHash {
   std::size_t operator()(const PointT& point) const {
@@ -46,7 +49,8 @@ enum class EmTypeT : std::uint8_t {
   SIZE = 5U,
 };
 
-using EnvCollectionT = std::unordered_map<PointT, EmTypeT, PointTHash>;
+using EnvMapT = std::unordered_map<PointT, EmTypeT, PointTHash>;
+using EnvCollectionT = std::vector<std::tuple<PointT, EmTypeT>>;
 
 std::vector<PointT> FilterE(const EnvCollectionT& es, const EmTypeT& type);
 

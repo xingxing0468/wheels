@@ -12,6 +12,7 @@ PROTOS += $(wildcard $(PROTO_PATH)/*.proto)
 SRC += $(wildcard *.cpp)
 SRC += $(wildcard service_implementation/*.cpp)
 SRC += $(wildcard utils/*.cpp)
+SRC += $(wildcard em/*.cpp)
 
 # .proto generated sources
 SRC += $(patsubst %.proto, %.pb.cc, $(addprefix $(PROTO_OUT)/, $(notdir $(PROTOS))))
@@ -23,7 +24,7 @@ LIBS += protobuf
 
 TARGET = libzprobe_impl.so
 
-FLAGS += -DNDEBUG -g -fPIC -shared -std=c++11
+FLAGS += -DNDEBUG -g -fPIC -shared -std=c++14
 
 MAJOR_VERSION = 1
 MINOR_VERSION = 0

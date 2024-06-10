@@ -1,14 +1,13 @@
 #include "ZEm.h"
 
-namespace detail {
-std::vector<PointT> FilterEnv(const EnvCollectionT& es, const EmTypeT& type) {
+std::vector<PointT> FilterE(const EnvCollectionT& es, const EmTypeT& type) {
   std::vector<PointT> ret;
 
-  for (const auto& e : es) {
-    if (e.second == type) {
-      ret.push_back(e.first);
+  for (const auto e : es) {
+    if (std::get<EmTypeT>(e) == type) {
+      ret.push_back(std::get<PointT>(e));
     }
   }
   return ret;
-}
-}  // namespace detail
+
+}  // namespace
