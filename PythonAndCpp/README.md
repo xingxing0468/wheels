@@ -13,6 +13,8 @@
   * [Python](#python)
   * [Build](#build)
 * [Integration](#integration)
+  * [Old School](#old-school-homemade-workspace)
+  * [Modern Worksapce](#modern-with-3rd-party-workspace-environmenteg-bazel)
 * [Further development](#further-development)
 
 ## Background
@@ -102,5 +104,38 @@ The build system in this wheel is just a very simple native MAKEFILE based syste
   ```
 - Now its the time to play with the framework. Please refer to exisiting [trial](trial.py). Happy hacking!
 ## Integration
+### Old School Homemade Workspace
+Since the purpose of this wheel is to enable the rapid prototypes with Python, its always the first choice to solve the dependencies with **QUICK** and **DIRTY** approach instead of make it a real 'project'. Therefore, this intergation solution is **HIGHLY** recommanded for the further Python scripts with [Ipython](https://ipython.org/) / [Jupter Notebook](https://jupyter.org/)/ ...
+Here are the mandantory artifacts:
+- C++ implmentation library: `libzprobe_impl.so` in `src/cpp/.out` after `make`, directly set the `LD_LIBRARY_PATH` with
+  ```shell
+    export LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WORKSPACE/src/cpp/.out/
+  ```
+  or distribute it somewhere else first.
+- Python module setup library: `zprobe.cpython-310-x86_64-linux-gnu.so` after `make`, directly set the `PYTHONPATH` with
+  ```shell
+    export PYTHONPATH = $PYTHONPATH:$WORKSPACE/.out/
+  ```
+  or distribute it somewhere else first.
+- Generated Python files from `protoc`(protobuf compiler) based on the *.proto* file interface, e.g. `proto_out/IEmService_pb2.py` after `make`, directly set the `PYTHONPATH` with
+  ```shell
+    export PYTHONPATH = $PYTHONPATH:$WORKSPACE/.proto_out/
+  ```
+  or distribute them somewhere else first.
+- Python service implementation files fullfiling the protobuf requirement:
+  - [z_service_channel.py](src/python/z_service_channel.py)
+  - [z_service_controller](src/python/z_service_controller.py)
+  - [z_service_package_helper.py](src/python/z_service_package_helper.py)
+  - [i_service_probe.py](src/python/service_probe/i_service_probe.py)
+  - [z_c_extension_service_probe.py](src/python/service_probe/z_c_extension_service_probe.py)
+  directly set the `PYTHONPATH` with
+  ```shell
+    export PYTHONPATH = $PYTHONPATH:$WORKSPACE/src/python
+  ```
+  or distribute them somewhere else first.
+- Existing upstream share library from C++ implementation.(**TODO**)
+
+### Modern with 3rd Party Workspace environment(e.g. bazel)
 
 ## Further Development
+- Make this wheel as a [bazel](https://github.com/bazelbuild/bazel) workspace to be more easier to integrated to the application with bazel build system.
