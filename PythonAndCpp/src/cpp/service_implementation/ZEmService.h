@@ -1,7 +1,7 @@
 #ifndef _Z_EM_SERVICE_H_
 #define _Z_EM_SERVICE_H_
 
-#include "IEmService.pb.h"
+#include "src/interface/IEmService.pb.h"
 
 class ZEmService : public em::Em {
  public:

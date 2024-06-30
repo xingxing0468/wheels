@@ -3,10 +3,10 @@
 
 #include <map>
 
-#include "ZServicePackage.h"
 #include "google/protobuf/empty.pb.h"
-#include "service_factory/ZEmServiceFactory.h"
-#include "service_factory/ZScrumServiceFactory.h"
+#include "src/cpp/service_factory/ZEmServiceFactory.h"
+#include "src/cpp/service_factory/ZScrumServiceFactory.h"
+#include "src/cpp/utils/ZServicePackage.h"
 
 // clang-format off
 
