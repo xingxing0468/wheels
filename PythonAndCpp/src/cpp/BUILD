@@ -3,6 +3,6 @@ cc_library(
     srcs = ["z_probe.cpp"],
     hdrs = [
     ],
-    visibility = ["//src:__subpackages__"],
+    visibility = ["//:__subpackages__"],
     deps = ["//src/cpp/utils:ServiceUtils"],
 )

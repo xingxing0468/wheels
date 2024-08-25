@@ -28,3 +28,25 @@ http_archive(
     strip_prefix = "googletest-f8d7d77c06936315286eb55f8de22cd23c188571",
     urls = ["https://github.com/google/googletest/archive/f8d7d77c06936315286eb55f8de22cd23c188571.zip"],
 )
+
+# Release: v3.1.0
+# TargetCommitish: master
+# Date: 2024-02-13 05:53:39 +0000 UTC
+# URL: https://github.com/stackb/rules_proto/releases/tag/v3.1.0
+# Size: 1995581 (2.0 MB)
+http_archive(
+    name = "build_stack_rules_proto",
+    sha256 = "ee7a11d66e7bbc5b0f7a35ca3e960cb9a5f8a314b22252e19912dfbc6e22782d",
+    strip_prefix = "rules_proto-3.1.0",
+    urls = ["https://github.com/stackb/rules_proto/archive/v3.1.0.tar.gz"],
+)
+
+register_toolchains("@build_stack_rules_proto//toolchain:standard")
+
+load("@build_stack_rules_proto//deps:core_deps.bzl", "core_deps")
+
+core_deps()
+
+load("@build_stack_rules_proto//deps:protobuf_core_deps.bzl", "protobuf_core_deps")
+
+protobuf_core_deps()
