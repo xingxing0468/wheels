@@ -9,7 +9,8 @@ def _compile_impl(ctx):
     ctx.actions.run_shell(
         outputs = [ctx.outputs.out],
         inputs = ctx.files.setup_files + ctx.files.input_files + ctx.files.deps,
-        command = " ".join(["python3"] + args),
+        command = " ".join(["python3"] + args) +
+                  ("; mv zprobe.cpython-310-x86_64-linux-gnu.so " + ctx.outputs.out.path),
         use_default_shell_env = True,
     )
 
