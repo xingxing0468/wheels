@@ -1,8 +1,5 @@
 from .i_service_probe import IServiceProbe
-import zprobe
-
-import sys
-
+from src.cpp.py_binding.libzprobe import zprobe
 
 class ZCExtensionServiceProbe(IServiceProbe):
     def __init__(self):

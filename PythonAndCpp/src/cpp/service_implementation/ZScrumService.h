@@ -1,7 +1,7 @@
 #ifndef _Z_SCRUM_SERVICE_H_
 #define _Z_SCRUM_SERVICE_H_
 
-#include "IScrumService.pb.h"
+#include "src/interface/IScrumService.pb.h"
 
 // clang-format off
 class ZScrumService : public scrum::Scrum

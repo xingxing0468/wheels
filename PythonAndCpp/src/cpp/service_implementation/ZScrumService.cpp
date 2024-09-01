@@ -1,5 +1,5 @@
 
-#include "ZScrumService.h"
+#include "src/cpp/service_implementation/ZScrumService.h"
 
 #include <stdio.h>
 
@@ -11,7 +11,7 @@ void ZScrumService::QueryTeam(
   google::protobuf::Closure* /*done*/)
 {
   printf("QueryTeam in CPP, request: \n [%s]\n", request->DebugString().c_str());
-  team_name_ = "Bingo";
+  team_name_ = "Zett";
   response->set_name(team_name_);
   return;
 }

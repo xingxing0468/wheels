@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
-from z_service_channel import ZServiceChannel
-from service_probe import ZCExtensionServiceProbe
+from src.python.service_client.z_service_channel import ZServiceChannel
+from src.python.service_probe.service_probe import ZCExtensionServiceProbe
 
 from IScrumService_pb2 import Developer
 from IScrumService_pb2 import Scrum_Stub
