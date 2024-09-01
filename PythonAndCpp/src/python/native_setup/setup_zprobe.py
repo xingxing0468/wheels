@@ -10,7 +10,7 @@ setup(name='zprobe',
       ext_modules=[
           Extension(
                   'zprobe',
-                  ['z_comm.c'],
+                  ['./src/python/native_setup/z_comm.c'],
                   include_dirs=['/usr/include/python3.6'],
                   extra_compile_args=["-fPIC"]
           )
