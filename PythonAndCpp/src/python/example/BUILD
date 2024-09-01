@@ -1,5 +1,5 @@
 py_binary(
     name = "example",
     srcs = ["example.py"],
-    data = ["//src/python/service_probe"],
+    deps = ["//src/python/service_probe"],
 )
