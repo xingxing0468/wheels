@@ -1,4 +1,4 @@
-from z_service_package_helper import ZServicePackageHelper
+from src.python.package_helper.z_service_package_helper import ZServicePackageHelper
 
 import unittest
 
@@ -15,8 +15,7 @@ class TestPackageHelper(unittest.TestCase):
             packaged_data, b'Zed\x20\x00\x00\x00\x05\x00\x00\x00Scrum\x02\x00\x00\x00\x08e\x15\xe9\x03\x00\x00\x1a\x03Zed')
 
     def test_unpackage(self):
-        package_data = b'Zed\x1a\x00\x00\x00\x05\x00\x00\x00Scrum\x00\x00\x00\x00\n\x04zett'
-        #package_data = b'Zed\x20\x00\x00\x00\x05\x00\x00\x00Scrum\x02\x00\x00\x00\x08e\x15\xe9\x03\x00\x00\x1a\x03Zed'
+        package_data = b'Zed\x20\x00\x00\x00\x05\x00\x00\x00Scrum\x02\x00\x00\x00\x08e\x15\xe9\x03\x00\x00\x1a\x03Zed'
         [service_name, method_id, serialized_data] = ZServicePackageHelper.UnPackage(
             package_data)
         self.assertEqual(service_name, 'Scrum')
