@@ -4,9 +4,8 @@
 #include <map>
 
 #include "google/protobuf/empty.pb.h"
-#include "src/cpp/service_factory/ZEmServiceFactory.h"
-#include "src/cpp/service_factory/ZScrumServiceFactory.h"
-#include "src/cpp/service_factory/ZStaticServiceFactoryCollector.h"
+#include "src/cpp/service_factory/common/ZRuntimeServiceFactoryCollector.h"
+#include "src/cpp/service_factory/common/ZStaticServiceFactoryCollector.h"
 #include "src/cpp/utils/ZServicePackage.h"
 
 // clang-format off
@@ -17,6 +16,10 @@ namespace
   ServiceFactoryCollectionT ServiceFactories{
     ZStaticServiceFactoryCollector::FetchAvailableServiceFactories()
   };
+
+  // ServiceFactoryCollectionT ServiceFactories{
+  //   ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories()
+  // };
 
   std::map<std::string, std::shared_ptr<google::protobuf::Service>> CachedServiceInstances;
 }

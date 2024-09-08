@@ -1,8 +1,8 @@
 #ifndef _Z_EM_SERVICE_FACTORY_H_
 #define _Z_EM_SERVICE_FACTORY_H_
 
-#include "src/cpp/service_factory/IServiceFactory.h"
-#include "src/cpp/service_implementation/ZEmService.h"
+#include "src/cpp/service_factory/common/IServiceFactory.h"
+#include "src/cpp/service_implementation/em_service/ZEmService.h"
 
 class ZEmServiceFactory : public IServiceFactory {
  public:

@@ -9,5 +9,8 @@ cc_library(
         "ZServicePackage.h",
     ],
     visibility = ["//src/cpp:__subpackages__"],
-    deps = ["//src/cpp/service_factory:ServicesFactory"],
+    deps = [
+        "//src/cpp/service_factory/common:RuntimeServiceFactoryCollector",
+        "//src/cpp/service_factory/common:StaticServiceFactoryCollector",
+    ],
 )
