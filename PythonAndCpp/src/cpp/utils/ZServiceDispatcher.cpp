@@ -6,6 +6,7 @@
 #include "google/protobuf/empty.pb.h"
 #include "src/cpp/service_factory/ZEmServiceFactory.h"
 #include "src/cpp/service_factory/ZScrumServiceFactory.h"
+#include "src/cpp/service_factory/ZStaticServiceFactoryCollector.h"
 #include "src/cpp/utils/ZServicePackage.h"
 
 // clang-format off
@@ -13,9 +14,8 @@
 namespace
 {
   constexpr int MAX_PARAM_SERIALIZED_SIZE = 1024;
-  std::map<std::string, IServiceFactory*> ServiceFactories{
-    {std::string("Scrum"), new ZScrumServiceFactory()},
-    {std::string("Em"), new ZEmServiceFactory()}
+  ServiceFactoryCollectionT ServiceFactories{
+    ZStaticServiceFactoryCollector::FetchAvailableServiceFactories()
   };
 
   std::map<std::string, std::shared_ptr<google::protobuf::Service>> CachedServiceInstances;
@@ -58,7 +58,7 @@ std::vector<uint8_t> Dispatch(const std::vector<uint8_t>& input_data)
 
   std::shared_ptr<google::protobuf::Service> service_ptr = CachedServiceInstances[service_name];
 
-  if (method_id >= service_ptr->GetDescriptor()->method_count()) {
+  if (method_id >= static_cast<std::uint32_t>(service_ptr->GetDescriptor()->method_count())) {
     // Method id exceed the limit
     printf("ERROR: Method id exceed the limit\n");
     return ret;
@@ -79,14 +79,14 @@ std::vector<uint8_t> Dispatch(const std::vector<uint8_t>& input_data)
 
   service_ptr->CallMethod(methodDes, nullptr, request, response, nullptr);
   if (!(response->GetDescriptor() == google::protobuf::Empty::descriptor())) { // NOT oneway call
-    if (response->ByteSize() > MAX_PARAM_SERIALIZED_SIZE) {
+    if (response->ByteSizeLong() > MAX_PARAM_SERIALIZED_SIZE) {
       // Exceed param serialized size
       printf("ERROR: Exceed param serialized size.\n");
       cleanup();
       return ret;
     }
     uint8_t buf[MAX_PARAM_SERIALIZED_SIZE];
-    if (!response->SerializeToArray(buf, response->ByteSize())) {
+    if (!response->SerializeToArray(buf, response->ByteSizeLong())) {
       // Serialization failed
       printf("ERROR: Output param serialization failed.\n");
       cleanup();
@@ -95,7 +95,7 @@ std::vector<uint8_t> Dispatch(const std::vector<uint8_t>& input_data)
     ret = ZServicePackage::Pack(
       service_name,
       method_id,
-      std::vector<uint8_t>(buf, buf + response->ByteSize()));
+      std::vector<uint8_t>(buf, buf + response->ByteSizeLong()));
   }
 
   cleanup();
