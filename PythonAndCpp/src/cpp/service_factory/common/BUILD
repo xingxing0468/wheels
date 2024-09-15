@@ -20,6 +20,7 @@ cc_library(
     ],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [
+        ":ServicesFactory",
         "//src/cpp/service_factory/em_service_factory:ZEmServiceFactory",
         "//src/cpp/service_factory/scrum_service_factory:ZScrumServiceFactory",
     ],

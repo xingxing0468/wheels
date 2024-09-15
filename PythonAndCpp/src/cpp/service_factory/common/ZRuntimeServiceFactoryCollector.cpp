@@ -5,8 +5,9 @@
 
 #include <filesystem>
 
-namespace ZRuntimeServiceFactoryCollector {
-ServiceFactoryCollectionT FetchAvailableServiceFactories() {
+ServiceFactoryCollectionT
+ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
+    const std::string& context) {
   ServiceFactoryCollectionT ret{};
 
   std::string (*GetServiceName)(){nullptr};
@@ -15,8 +16,8 @@ ServiceFactoryCollectionT FetchAvailableServiceFactories() {
   const std::string service_name_func_name{"GetServiceName"};
   const std::string service_factory_func_name{"GetServiceFactory"};
 
-  const std::filesystem::path current_dir{"./"};
-  for (const auto& file : std::filesystem::directory_iterator{current_dir}) {
+  for (const auto& file :
+       std::filesystem::directory_iterator{std::filesystem::path{context}}) {
     if (!file.is_regular_file()) {
       continue;
     }
@@ -76,5 +77,3 @@ ServiceFactoryCollectionT FetchAvailableServiceFactories() {
 
   return ret;
 }
-
-}  // namespace ZRuntimeServiceFactoryCollector

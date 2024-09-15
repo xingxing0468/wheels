@@ -3,10 +3,10 @@
 
 #include "src/cpp/service_factory/common/IServiceFactoryCollector.h"
 
-namespace ZStaticServiceFactoryCollector {
-
-ServiceFactoryCollectionT FetchAvailableServiceFactories();
-
-}  // namespace ZStaticServiceFactoryCollector
+class ZStaticServiceFactoryCollector {
+ public:
+  static ServiceFactoryCollectionT FetchAvailableServiceFactories(
+      const std::string& context = "");
+};
 
 #endif
