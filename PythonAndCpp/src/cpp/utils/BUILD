@@ -36,3 +36,12 @@ cc_library(
         "//src/cpp/service_factory/common:RuntimeServiceFactoryCollector",
     ],
 )
+
+filegroup(
+    name = "z_utils_srcs",
+    srcs = [
+        "ZServiceDispatcher.cpp",
+        "ZServicePackage.cpp",
+    ],
+    visibility = ["//:__subpackages__"],
+)

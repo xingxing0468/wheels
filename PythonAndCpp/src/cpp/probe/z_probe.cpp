@@ -11,17 +11,14 @@ namespace {
 ZServiceDispatcher g_dispatcher{};
 }
 
-extern "C" {
-
 void ResetServiceFactories(const std::string& context) {
   g_dispatcher.ResetServiceFactories<ZRuntimeServiceFactoryCollector>(context);
 };
 
-int OnServiceRequestReceived(const uint8_t* input_data, const int input_size,
-                             uint8_t output[]) {
+int OnServiceRequestReceived(const char* input_data, const int input_size,
+                             char output[]) {
   auto ret_vector = g_dispatcher.Dispatch(
       std::vector<uint8_t>(input_data, input_data + input_size));
   memcpy(output, ret_vector.data(), ret_vector.size());
   return ret_vector.size();
-}
 }

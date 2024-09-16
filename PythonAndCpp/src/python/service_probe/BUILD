@@ -9,7 +9,7 @@ py_library(
         "service_probe.py",
     ],
     data = [
-        "//src/cpp/py_binding:zprobe",
+        "//src/cpp/py_binding:zprobe.so",
     ],
     visibility = ["//:__subpackages__"],
     deps = [
