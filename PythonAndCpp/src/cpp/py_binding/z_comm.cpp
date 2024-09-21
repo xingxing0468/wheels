@@ -1,5 +1,6 @@
 #include <inttypes.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
 #include <pybind11/stl.h>
 
 #include <string>
@@ -14,14 +15,13 @@ void ResetServiceFactories_pybind11(const std::string& context) {
   return ResetServiceFactories(context);
 }
 
-std::vector<char> OnServiceRequestReceived_pybind11(
-    const std::vector<char>& input_data) {
-  std::vector<char> ret{};
+pybind11::bytes OnServiceRequestReceived_pybind11(
+    const pybind11::bytes& input_data) {
   char out_buff[MAX_OUTPUT_DATA_SIZE];
   const auto output_size{
-      OnServiceRequestReceived(input_data.data(), input_data.size(), out_buff)};
-  ret.insert(ret.end(), out_buff, out_buff + output_size);
-  return ret;
+      OnServiceRequestReceived(PyBytes_AsString(input_data.ptr()),
+                               PyBytes_Size(input_data.ptr()), out_buff)};
+  return {out_buff, output_size};
 }
 
 PYBIND11_MODULE(zprobe, m) {
