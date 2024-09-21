@@ -14,7 +14,7 @@ cc_library(
 cc_library(
     name = "ZScrumServiceFactoryRunTimeImpl",
     srcs = ["ZScrumServiceFactoryImpl.cpp"],
-    visibility = ["__subpackages__"],
+    visibility = ["//src/cpp:__subpackages__"],
     deps = [":ZScrumServiceFactory"],
 )
 

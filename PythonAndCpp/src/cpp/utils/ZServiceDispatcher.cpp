@@ -35,6 +35,8 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
   if (service_factories_.find(service_name) == service_factories_.end()) {
     // Serivce NOT supported
     printf("ERROR: service NOT supported\n");
+    ret =
+        ZServicePackage::Pack(service_name, method_id, std::vector<uint8_t>{});
     return ret;
   }
 
@@ -52,6 +54,8 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
                        service_ptr->GetDescriptor()->method_count())) {
     // Method id exceed the limit
     printf("ERROR: Method id exceed the limit\n");
+    ret =
+        ZServicePackage::Pack(service_name, method_id, std::vector<uint8_t>{});
     return ret;
   }
 
