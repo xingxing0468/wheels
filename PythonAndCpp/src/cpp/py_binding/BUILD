@@ -13,7 +13,6 @@ pybind_extension(
     srcs = [
         "//src/cpp/probe:z_probe",
         "//src/cpp/py_binding:z_comm",
-        "//src/cpp/utils:z_utils_srcs",
     ],
     visibility = ["//:__subpackages__"],
     deps = [

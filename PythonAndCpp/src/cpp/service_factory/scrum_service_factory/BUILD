@@ -14,8 +14,14 @@ cc_library(
 cc_library(
     name = "ZScrumServiceFactoryRunTimeImpl",
     srcs = ["ZScrumServiceFactoryImpl.cpp"],
-    visibility = ["//src:__subpackages__"],
+    visibility = ["__subpackages__"],
     deps = [":ZScrumServiceFactory"],
+)
+
+cc_shared_library(
+    name = "ZScrumServiceFactoryRunTimePlugin",
+    roots = [":ZScrumServiceFactoryRunTimeImpl"],
+    visibility = ["//src:__subpackages__"],
 )
 
 service_plugin(
