@@ -15,3 +15,9 @@ cc_library(
     visibility = ["//src/cpp:__subpackages__"],
     deps = [":ZEmServiceFactory"],
 )
+
+cc_shared_library(
+    name = "ZEmServiceFactoryRunTimePlugin",
+    roots = [":ZEmServiceFactoryRunTimeImpl"],
+    visibility = ["//src:__subpackages__"],
+)

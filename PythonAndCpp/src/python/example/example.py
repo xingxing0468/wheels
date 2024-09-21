@@ -12,7 +12,7 @@ from src.interface.IEmService_pb2 import Em_Stub
 import src.cpp.py_binding.zprobe as zprobe
 
 if __name__ == "__main__":
-    zprobe.reset_service_path("src/cpp/service_factory/scrum_service_factory")
+    zprobe.reset_service_path("src/python/example/service_plugins") # runfile path for plugins
     dev = Developer()
     dev.name = 'zed'
     dev.value = 1001
