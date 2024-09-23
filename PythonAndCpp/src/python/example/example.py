@@ -3,14 +3,16 @@
 from src.python.service_client.z_service_channel import ZServiceChannel
 from src.python.service_probe.service_probe import ZCExtensionServiceProbe
 
-from IScrumService_pb2 import Developer
-from IScrumService_pb2 import Scrum_Stub
+from src.interface.IScrumService_pb2 import Developer
+from src.interface.IScrumService_pb2 import Scrum_Stub
 
-from IEmService_pb2 import PointT, EmType, EmT, FilterInputT, PointCollectionT
-from IEmService_pb2 import Em_Stub
+from src.interface.IEmService_pb2 import PointT, EmType, EmT, FilterInputT, PointCollectionT
+from src.interface.IEmService_pb2 import Em_Stub
 
+import src.cpp.py_binding.zprobe as zprobe
 
 if __name__ == "__main__":
+    zprobe.reset_service_path("src/python/example/service_plugins") # runfile path for plugins
     dev = Developer()
     dev.name = 'zed'
     dev.value = 1001

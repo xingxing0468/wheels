@@ -1,3 +1,5 @@
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension")
+
 filegroup(
     name = "z_comm",
     srcs = [
@@ -6,18 +8,14 @@ filegroup(
     visibility = ["//:__subpackages__"],
 )
 
-cc_binary(
+pybind_extension(
     name = "zprobe",
     srcs = [
+        "//src/cpp/probe:z_probe",
         "//src/cpp/py_binding:z_comm",
     ],
-    copts = [
-        "-fPIC",
-    ],
-    linkshared = 1,
     visibility = ["//:__subpackages__"],
     deps = [
         "//src/cpp/probe:Probe",
-        "@pybind11//:pybind11_lib",
     ],
 )

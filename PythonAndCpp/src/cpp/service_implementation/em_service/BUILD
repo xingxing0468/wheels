@@ -1,12 +1,10 @@
 cc_library(
-    name = "ServicesImpl",
+    name = "EmServicesImpl",
     srcs = [
         "ZEmService.cpp",
-        "ZScrumService.cpp",
     ],
     hdrs = [
         "ZEmService.h",
-        "ZScrumService.h",
     ],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [

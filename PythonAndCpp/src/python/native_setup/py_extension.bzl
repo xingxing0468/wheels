@@ -1,5 +1,3 @@
-load("@rules_cc//cc:action_names.bzl", "C_COMPILE_ACTION_NAME")
-
 def _compile_impl(ctx):
     args = [f.path for f in ctx.files.setup_files] + ["build_ext", "--inplace"]
     args.append("--libraries=" + ",".join([dep.basename.split(".so")[0][3:] for dep in ctx.files.deps if dep.basename.endswith(".so")]))
