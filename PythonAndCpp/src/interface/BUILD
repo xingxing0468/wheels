@@ -28,7 +28,7 @@ proto_cc_library(
     name = "cc_interfaces",
     srcs = [service + ".pb.cc" for service in SERVICES],
     hdrs = [service + ".pb.h" for service in SERVICES],
-    visibility = ["//src:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         "@com_google_protobuf//:protobuf",
     ],

@@ -4,7 +4,7 @@ cc_library(
     hdrs = ["ZScrumServiceFactory.h"],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [
-        "//src/cpp/service_factory/common:ServicesFactory",
+        "//exports/cpp:ServicesFactory",
         "//src/cpp/service_implementation/scrum_service:ScrumServicesImpl",
     ],
 )

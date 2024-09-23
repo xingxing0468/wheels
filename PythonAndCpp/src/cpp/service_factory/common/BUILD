@@ -1,13 +1,10 @@
 cc_library(
-    name = "ServicesFactory",
-    srcs = [
-        "ServiceFactory.cpp",
-    ],
+    name = "ServicesFactoryCollector",
     hdrs = [
-        "IServiceFactory.h",
         "IServiceFactoryCollector.h",
     ],
-    visibility = ["//src/cpp:__subpackages__"],
+    visibility = ["//visibility:public"],
+    deps = ["//exports/cpp:ServicesFactory"],
 )
 
 cc_library(
@@ -20,7 +17,7 @@ cc_library(
     ],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [
-        ":ServicesFactory",
+        ":ServicesFactoryCollector",
         "//src/cpp/service_factory/em_service_factory:ZEmServiceFactory",
         "//src/cpp/service_factory/scrum_service_factory:ZScrumServiceFactory",
     ],
@@ -35,5 +32,5 @@ cc_library(
         "ZRuntimeServiceFactoryCollector.h",
     ],
     visibility = ["//src/cpp:__subpackages__"],
-    deps = [":ServicesFactory"],
+    deps = [":ServicesFactoryCollector"],
 )

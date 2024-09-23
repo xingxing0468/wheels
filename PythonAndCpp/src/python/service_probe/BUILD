@@ -11,7 +11,7 @@ py_library(
     data = [
         "//src/cpp/py_binding:zprobe.so",
     ],
-    visibility = ["//:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         "//src/python/service_client",
     ],

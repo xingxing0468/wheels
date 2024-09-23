@@ -4,7 +4,7 @@ py_library(
         "z_service_channel.py",
         "z_service_controller.py",
     ],
-    visibility = ["//:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         "//src/interface:py_interfaces",
         "//src/python/package_helper",
