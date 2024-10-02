@@ -6,7 +6,7 @@ from src.python.service_probe.service_probe import ZCExtensionServiceProbe
 from src.interface.IScrumService_pb2 import Developer
 from src.interface.IScrumService_pb2 import Scrum_Stub
 
-from src.interface.IEmService_pb2 import PointT, EmType, EmT, FilterInputT, PointCollectionT
+from src.interface.IEmService_pb2 import PointT, EmType, EmT, FilterInputT
 from src.interface.IEmService_pb2 import Em_Stub
 
 import src.cpp.py_binding.zprobe as zprobe

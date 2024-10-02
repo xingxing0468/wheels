@@ -4,7 +4,7 @@ cc_library(
     hdrs = ["ZEmServiceFactory.h"],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [
-        "//src/cpp/service_factory/common:ServicesFactory",
+        "//exports/cpp:ServicesFactory",
         "//src/cpp/service_implementation/em_service:EmServicesImpl",
     ],
 )

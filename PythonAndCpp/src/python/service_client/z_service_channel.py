@@ -1,6 +1,6 @@
 from google.protobuf import service
 from google.protobuf import empty_pb2
-from src.python.package_helper.z_service_package_helper import ZServicePackageHelper
+from ..package_helper.z_service_package_helper import ZServicePackageHelper
 
 # TODO UT
 
