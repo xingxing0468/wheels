@@ -8,6 +8,7 @@ cc_library(
     ],
     visibility = ["//src/cpp:__subpackages__"],
     deps = [
+        "//src/cpp/utils:Trace",
         "//src/interface:cc_interfaces",
     ],
 )

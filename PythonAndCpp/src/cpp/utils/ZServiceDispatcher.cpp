@@ -4,6 +4,7 @@
 #include <map>
 
 #include "google/protobuf/empty.pb.h"
+#include "src/cpp/utils/Trace.h"
 #include "src/cpp/utils/ZServicePackage.h"
 
 namespace {
@@ -34,7 +35,7 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
 
   if (service_factories_.find(service_name) == service_factories_.end()) {
     // Serivce NOT supported
-    printf("ERROR: service NOT supported\n");
+    TRACE("ERROR: service NOT supported\n");
     ret =
         ZServicePackage::Pack(service_name, method_id, std::vector<uint8_t>{});
     return ret;
@@ -53,7 +54,7 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
   if (method_id >= static_cast<std::uint32_t>(
                        service_ptr->GetDescriptor()->method_count())) {
     // Method id exceed the limit
-    printf("ERROR: Method id exceed the limit\n");
+    TRACE("ERROR: Method id exceed the limit\n");
     ret =
         ZServicePackage::Pack(service_name, method_id, std::vector<uint8_t>{});
     return ret;
@@ -68,7 +69,7 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
   if (!request->ParseFromArray(serialized_input_param.data(),
                                serialized_input_param.size())) {
     // Fail to de-serialize input param
-    printf("ERROR: Fail to de-serialize input param.\n");
+    TRACE("ERROR: Fail to de-serialize input param.\n");
     cleanup();
     return ret;
   }
@@ -78,14 +79,14 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
         google::protobuf::Empty::descriptor())) {  // NOT oneway call
     if (response->ByteSizeLong() > MAX_PARAM_SERIALIZED_SIZE) {
       // Exceed param serialized size
-      printf("ERROR: Exceed param serialized size.\n");
+      TRACE("ERROR: Exceed param serialized size.\n");
       cleanup();
       return ret;
     }
     uint8_t buf[MAX_PARAM_SERIALIZED_SIZE];
     if (!response->SerializeToArray(buf, response->ByteSizeLong())) {
       // Serialization failed
-      printf("ERROR: Output param serialization failed.\n");
+      TRACE("ERROR: Output param serialization failed.\n");
       cleanup();
       return ret;
     }

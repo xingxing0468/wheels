@@ -5,6 +5,8 @@
 
 #include <filesystem>
 
+#include "src/cpp/utils/Trace.h"
+
 ServiceFactoryCollectionT
 ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     const std::string& context) {
@@ -26,8 +28,7 @@ ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     }
     void* service_factory_obj = dlopen(file.path().c_str(), RTLD_LAZY);
     if (!service_factory_obj) {
-      printf("WARNING: Load lib file: [%s] failed, skip\n",
-             file.path().c_str());
+      TRACE("WARNING: Load lib file: [%s] failed, skip\n", file.path().c_str());
       continue;
     }
 
@@ -35,8 +36,8 @@ ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     void* service_name_func{
         dlsym(service_factory_obj, service_name_func_name.c_str())};
     if (!service_name_func) {
-      printf("WARNING: Get symbol [%s] from lib file [%s] failed, skip.\n",
-             service_name_func_name.c_str(), file.path().c_str());
+      TRACE("WARNING: Get symbol [%s] from lib file [%s] failed, skip.\n",
+            service_name_func_name.c_str(), file.path().c_str());
       continue;
     }
     GetServiceName =
@@ -44,7 +45,7 @@ ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     const std::string service_name{(*GetServiceName)()};
 
     if (ret.find(service_name) != ret.end()) {
-      printf(
+      TRACE(
           "WARNING: service name [%s] already loaded, skip to load lib file "
           "[%s].\n",
           service_name.c_str(), file.path().c_str());
@@ -55,23 +56,23 @@ ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     void* service_factory_func{
         dlsym(service_factory_obj, service_factory_func_name.c_str())};
     if (!service_factory_func) {
-      printf("WARNING: Get symbol [%s] from lib file [%s] failed, skip.\n",
-             service_factory_func_name.c_str(), file.path().c_str());
+      TRACE("WARNING: Get symbol [%s] from lib file [%s] failed, skip.\n",
+            service_factory_func_name.c_str(), file.path().c_str());
       continue;
     }
     GetServiceFactory =
         reinterpret_cast<decltype(GetServiceFactory)>(service_factory_func);
     auto service_factory_ptr{(*GetServiceFactory)()};
     if (!service_factory_ptr) {
-      printf(
+      TRACE(
           "WARNING: Get service factory ptr for service [%s] from lib file "
           "[%s] failed, skip.\n",
           service_name.c_str(), file.path().c_str());
       continue;
     }
 
-    printf("Successfully loaded service [%s] from lib file [%s]\n",
-           service_name.c_str(), file.path().c_str());
+    TRACE("Successfully loaded service [%s] from lib file [%s]\n",
+          service_name.c_str(), file.path().c_str());
     ret[service_name] = service_factory_ptr;
   }
 

@@ -19,6 +19,7 @@ cc_library(
     deps = [
         ":ServicePackage",
         "//src/cpp/service_factory/common:RuntimeServiceFactoryCollector",
+        "//src/cpp/utils:Trace",
         "@com_google_protobuf//:protobuf",
     ],
 )
@@ -44,4 +45,11 @@ filegroup(
         "ZServicePackage.cpp",
     ],
     visibility = ["//:__subpackages__"],
+)
+
+cc_library(
+    name = "Trace",
+    srcs = ["Trace.cpp"],
+    hdrs = ["Trace.h"],
+    visibility = ["//src/cpp:__subpackages__"],
 )

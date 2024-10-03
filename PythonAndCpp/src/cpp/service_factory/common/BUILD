@@ -32,5 +32,8 @@ cc_library(
         "ZRuntimeServiceFactoryCollector.h",
     ],
     visibility = ["//src/cpp:__subpackages__"],
-    deps = [":ServicesFactoryCollector"],
+    deps = [
+        ":ServicesFactoryCollector",
+        "//src/cpp/utils:Trace",
+    ],
 )
