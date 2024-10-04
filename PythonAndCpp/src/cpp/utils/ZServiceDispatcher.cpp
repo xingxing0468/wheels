@@ -8,13 +8,12 @@
 #include "src/cpp/utils/ZServicePackage.h"
 
 namespace {
-constexpr int MAX_PARAM_SERIALIZED_SIZE = 1024;
 std::map<std::string, std::shared_ptr<google::protobuf::Service>>
     CachedServiceInstances;
 }  // namespace
 
 std::vector<uint8_t> ZServiceDispatcher::Dispatch(
-    const std::vector<uint8_t>& input_data) {
+    const std::vector<uint8_t>& input_data) const {
   google::protobuf::Message* request = nullptr;
   google::protobuf::Message* response = nullptr;
 
@@ -45,7 +44,7 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
           CachedServiceInstances.end() ||
       !CachedServiceInstances[service_name]) {
     CachedServiceInstances[service_name] =
-        service_factories_[service_name]->GenerateServiceInstance();
+        service_factories_.at(service_name)->GenerateServiceInstance();
   }
 
   std::shared_ptr<google::protobuf::Service> service_ptr =

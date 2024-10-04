@@ -8,7 +8,7 @@
 class IServiceFactory
 {
 public:
-  virtual std::shared_ptr<google::protobuf::Service> GenerateServiceInstance() = 0;
+  virtual std::shared_ptr<google::protobuf::Service> GenerateServiceInstance() const = 0;
 };
 
 #endif

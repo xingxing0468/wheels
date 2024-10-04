@@ -7,7 +7,7 @@
 class ZEmServiceFactory : public IServiceFactory {
  public:
   std::shared_ptr<google::protobuf::Service> GenerateServiceInstance()
-      override {
+      const override {
     return std::make_shared<ZEmService>();
   }
 };
