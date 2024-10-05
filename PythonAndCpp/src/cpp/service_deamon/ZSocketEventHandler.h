@@ -9,7 +9,8 @@
 
 class ZSocketEventHandler : public IEventHandler {
  public:
-  ZSocketEventHandler(ZEventloop& eventloop, const ZServiceDispatcher& dispatcher);
+  ZSocketEventHandler(ZEventloop& eventloop,
+                      const ZServiceDispatcher& dispatcher);
   ~ZSocketEventHandler();
 
   void HandleEvent(int fd) override;
@@ -22,7 +23,8 @@ class ZSocketEventHandler : public IEventHandler {
 
   std::string server_socket_name_{};
   int server_socket_fd_{-1};
-  int server_accepted_fd_{-1};
+  int server_accepted_fd_{-1};  // Only one connection is supported,
+                                // TODO: support multi fds for multi-connections
   ZEventloop& eventloop_;
   const ZServiceDispatcher& dispatcher_;
 };

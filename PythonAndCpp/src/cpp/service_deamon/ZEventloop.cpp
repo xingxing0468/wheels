@@ -31,8 +31,7 @@ void ZEventloop::Run() {
       auto eventIter = Events.find(eventData->Fd);
       assert(eventIter != Events.end());  // event must be in Events
       TRACE("Executing event, index: [%d], fd: [%d]", i, eventData->Fd);
-      auto handler =
-          static_cast<std::shared_ptr<IEventHandler>>(eventData->Handler);
+      auto handler = static_cast<IEventHandler*>(eventData->Handler);
 
       if (!handler) {  // actually this static_cast would NOT return NULL, due
                        // to cast form void*
@@ -45,7 +44,7 @@ void ZEventloop::Run() {
   return;
 }
 
-void ZEventloop::AddFd(int fd, std::shared_ptr<IEventHandler> handler) {
+void ZEventloop::AddFd(int fd, IEventHandler* handler) {
   TRACE("Current event count: [%zu], max: [%d]", Events.size(), MAX_EVENTS);
 
   if (Events.find(fd) != Events.end()) {

@@ -9,7 +9,8 @@ py_binary(
     ],
     deps = [
         "//src/python/service_client",
-        "//src/python/service_probe",
+        "//src/python/service_probe:z_c_extension_service_probe",
+        "//src/python/service_probe:z_socket_service_probe",
     ],
 )
 

@@ -3,16 +3,22 @@
 ## Seperate the proto buf deps and service impl into plug-ins.
 ## Then the py_binding will be more independent.
 py_library(
-    name = "service_probe",
+    name = "z_c_extension_service_probe",
     srcs = [
         "i_service_probe.py",
-        "service_probe.py",
+        "z_c_extension_service_probe.py",
     ],
     data = [
         "//src/cpp/py_binding:zprobe.so",
     ],
     visibility = ["//visibility:public"],
-    deps = [
-        "//src/python/service_client",
+)
+
+py_library(
+    name = "z_socket_service_probe",
+    srcs = [
+        "i_service_probe.py",
+        "z_socket_service_probe.py",
     ],
+    visibility = ["//visibility:public"],
 )

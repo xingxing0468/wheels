@@ -2,6 +2,8 @@
 
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
@@ -10,11 +12,48 @@
 
 namespace {
 const std::string IPC_SOCKET_NAME = "/tmp/IpcSocket";
+
+std::string DumpWithAscii(const uint8_t* data, int size) {
+  constexpr int DEFAULT_ASCII_WRAP = 0x10;
+  std::string ret;
+  std::string hexLine;
+  std::string asciiLine;
+
+  char tmpCharArray[4];
+  char tmpAsciiArray[2];
+  memset(tmpCharArray, 0, 4);
+  memset(tmpAsciiArray, 0, 2);
+
+  for (int i = 0; i < size; i++) {
+    sprintf(tmpCharArray, "%02X ", data[i]);
+    sprintf(tmpAsciiArray, "%c", isprint(data[i]) != 0 ? data[i] : '.');
+    hexLine += tmpCharArray;
+    asciiLine += tmpAsciiArray;
+    memset(tmpCharArray, 0, 4);
+    memset(tmpAsciiArray, 0, 2);
+    if ((i + 1) % DEFAULT_ASCII_WRAP == 0) {
+      ret += hexLine + "    " + asciiLine + '\n';
+      hexLine.clear();
+      asciiLine.clear();
+    }
+  }
+  // deal with the rest
+  int restToFill = DEFAULT_ASCII_WRAP - size % DEFAULT_ASCII_WRAP;
+  if (!hexLine.empty()) {
+    for (int i = 0; i < restToFill; i++) {
+      hexLine += "   ";  // %2X + ' '
+    }
+    ret += hexLine + "    " + asciiLine + '\n';
+  }
+  return ret;
 }
+}  // namespace
 
 ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
                                          const ZServiceDispatcher& dispatcher)
-    : eventloop_{eventloop}, dispatcher_{dispatcher} {
+    : server_socket_name_{IPC_SOCKET_NAME},
+      eventloop_{eventloop},
+      dispatcher_{dispatcher} {
   struct sockaddr_un serverAddr;
   auto init = [&, this]() -> bool {
     if ((this->server_socket_fd_ = socket(PF_LOCAL, SOCK_STREAM, 0)) == -1) {
@@ -32,8 +71,8 @@ ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
     }
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sun_family = AF_LOCAL;
-    // Use abstract name space, leave first byte as '\0'
-    strcpy(serverAddr.sun_path + 1, this->server_socket_name_.c_str());
+    strcpy(serverAddr.sun_path, this->server_socket_name_.c_str());
+
     return true;
   };
 
@@ -70,7 +109,7 @@ ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
     TRACE("Fail to listen socket!");
   }
 
-  eventloop_.AddFd(server_socket_fd_, std::shared_ptr<IEventHandler>(this));
+  eventloop_.AddFd(server_socket_fd_, this);
 }
 
 ZSocketEventHandler::~ZSocketEventHandler() {
@@ -98,12 +137,16 @@ void ZSocketEventHandler::HandleEvent(int fd) {
 }
 
 void ZSocketEventHandler::HandleConnect() {
+  if (server_accepted_fd_ != -1) {
+    TRACE("WARNING: ONLY one connection is supported now, skip...");
+    return;
+  }
   if ((server_accepted_fd_ = accept(server_socket_fd_, NULL, NULL)) == -1) {
     TRACE("ERROR: Accept once failed: [%d]", errno);
     return;
   }
 
-  eventloop_.AddFd(server_accepted_fd_, std::shared_ptr<IEventHandler>(this));
+  eventloop_.AddFd(server_accepted_fd_, this);
 }
 
 void ZSocketEventHandler::HandleCall() {
@@ -117,6 +160,11 @@ void ZSocketEventHandler::HandleCall() {
   if (length < 0) {
     eventloop_.RemoveFd(server_socket_fd_);
     close(server_socket_fd_);
+  } else if (length == 0) {
+    TRACE("Client disconnected, remove accepted FD: [%d]\n",
+          server_accepted_fd_);
+    eventloop_.RemoveFd(server_accepted_fd_);
+    server_accepted_fd_ = -1;
   } else {
     std::vector<std::uint8_t> ipc_message;
     ipc_message.insert(ipc_message.begin(), payload, payload + length);
@@ -139,7 +187,8 @@ int ZSocketEventHandler::ReceiveAllFromSocket(int fd, uint8_t* buffer,
   }
   bytesRead += result;
   // }
-  // TRACE("Receive from fd: [%d] completed, payload:", fd);
-  // TRACE("\n%s", Hex::DumpWithAscii(buffer, length).c_str());
+  TRACE("Receive from fd: [%d] completed, length: [%d] payload:", fd,
+        bytesRead);
+  TRACE("\n%s", DumpWithAscii(buffer, bytesRead).c_str());
   return bytesRead;
 }
