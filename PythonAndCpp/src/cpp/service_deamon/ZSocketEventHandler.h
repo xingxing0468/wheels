@@ -14,6 +14,8 @@ class ZSocketEventHandler : public IEventHandler {
   ~ZSocketEventHandler();
 
   void HandleEvent(int fd) override;
+  void Init();
+  void CleanUp();
 
  private:
   void HandleConnect();  // Current always allow connect request, TODO accepted

@@ -8,6 +8,8 @@
 #include <sys/un.h>
 #include <unistd.h>
 
+#include <filesystem>
+
 #include "src/cpp/utils/Trace.h"
 
 namespace {
@@ -54,6 +56,23 @@ ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
     : server_socket_name_{IPC_SOCKET_NAME},
       eventloop_{eventloop},
       dispatcher_{dispatcher} {
+  Init();
+}
+
+ZSocketEventHandler::~ZSocketEventHandler() { CleanUp(); }
+
+void ZSocketEventHandler::HandleEvent(int fd) {
+  if (fd == server_socket_fd_) {
+    HandleConnect();
+  } else if (fd == server_accepted_fd_) {
+    HandleCall();
+  } else {
+    TRACE("Invalid Fd[%d] received, ServerSocketFd: [%d], AcceptedFd: [%d]", fd,
+          server_socket_fd_, server_accepted_fd_);
+  }
+}
+
+void ZSocketEventHandler::Init() {
   struct sockaddr_un serverAddr;
   auto init = [&, this]() -> bool {
     if ((this->server_socket_fd_ = socket(PF_LOCAL, SOCK_STREAM, 0)) == -1) {
@@ -71,6 +90,13 @@ ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
     }
     memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sun_family = AF_LOCAL;
+
+    // Normally to make an anomynous socket we make the first byte as '\0'
+    // But in some OS and for PY it check the length for the char '\0'
+    // So it does not work,
+    // Then in the cleanup we have to manually unlink the socket name
+    // To avoid failure of next creation.
+    // strcpy(serverAddr.sun_path + 1, this->server_socket_name_.c_str());
     strcpy(serverAddr.sun_path, this->server_socket_name_.c_str());
 
     return true;
@@ -112,27 +138,20 @@ ZSocketEventHandler::ZSocketEventHandler(ZEventloop& eventloop,
   eventloop_.AddFd(server_socket_fd_, this);
 }
 
-ZSocketEventHandler::~ZSocketEventHandler() {
-  close(server_socket_fd_);
-  auto closeConnection = [&]() {};
-
-  auto closeServerSocket = [&]() {};
-
-  auto cleanUp = [&]() {};
-
-  closeConnection();
-  closeServerSocket();
-  cleanUp();
-}
-
-void ZSocketEventHandler::HandleEvent(int fd) {
-  if (fd == server_socket_fd_) {
-    HandleConnect();
-  } else if (fd == server_accepted_fd_) {
-    HandleCall();
-  } else {
-    TRACE("Invalid Fd[%d] received, ServerSocketFd: [%d], AcceptedFd: [%d]", fd,
-          server_socket_fd_, server_accepted_fd_);
+void ZSocketEventHandler::CleanUp() {
+  if (server_accepted_fd_ != -1) {
+    eventloop_.RemoveFd(server_accepted_fd_);
+    server_accepted_fd_ = -1;
+  }
+  if (server_socket_fd_ != -1) {
+    eventloop_.RemoveFd(server_socket_fd_);
+    close(server_socket_fd_);
+    server_socket_fd_ = -1;
+  }
+  std::filesystem::path socket_file{IPC_SOCKET_NAME};
+  if (std::filesystem::exists(socket_file)) {
+    TRACE("Clean up socket file...");
+    std::filesystem::remove(socket_file);
   }
 }
 
