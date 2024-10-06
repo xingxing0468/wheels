@@ -169,45 +169,47 @@ void ZSocketEventHandler::HandleConnect() {
 }
 
 void ZSocketEventHandler::HandleCall() {
-  std::uint8_t payload[ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE + 1] = {
-      0U};
-
-  // We never known how long we need to receive
-  // Since its a local socket and only buffer copy from kernel to userspace
-  // with limited payload length, should be OK
-  const auto length = ReceiveAllFromSocket(server_accepted_fd_, payload, 0);
-  if (length < 0) {
-    eventloop_.RemoveFd(server_socket_fd_);
-    close(server_socket_fd_);
-  } else if (length == 0) {
-    TRACE("Client disconnected, remove accepted FD: [%d]\n",
-          server_accepted_fd_);
-    eventloop_.RemoveFd(server_accepted_fd_);
-    server_accepted_fd_ = -1;
-  } else {
-    std::vector<std::uint8_t> ipc_message;
-    ipc_message.insert(ipc_message.begin(), payload, payload + length);
-
+  const auto ipc_message{ReceiveAllFromSocket()};
+  if (!ipc_message.empty()) {
     const auto result_message = dispatcher_.Dispatch(ipc_message);
   }
 }
 
-int ZSocketEventHandler::ReceiveAllFromSocket(int fd, uint8_t* buffer,
-                                              int /*length*/) {
-  int bytesRead = 0, result = 0;
-  // while (bytesRead < length) {
-  result = recv(fd, buffer, ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE,
-                MSG_DONTWAIT);  // NON-block
-  if (result == -1)             // && errno == ??)
-  {
-  } else if (result <= 0) {  // 0 -> peer has performed shutdown
-    TRACE("ERROR when read from socket, error: [%d]\n", errno);
-    return result;
+std::vector<std::uint8_t> ZSocketEventHandler::ReceiveAllFromSocket() {
+  std::vector<std::uint8_t> ret{};
+  std::uint8_t payload[ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE + 1] = {
+      0U};
+
+  bool keep_receiving{true};
+  int result{-1};
+  // We never known how long we need to receive
+  // Since its a local socket and only buffer copy from kernel to userspace
+  // with limited payload length, should be OK
+  while (keep_receiving) {
+    result = recv(server_accepted_fd_, payload,
+                  ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE,
+                  MSG_DONTWAIT);  // NON-block
+    if (result < 0 && errno == EAGAIN) {
+      keep_receiving = true;
+    } else {
+      keep_receiving = false;
+    }
   }
-  bytesRead += result;
-  // }
-  TRACE("Receive from fd: [%d] completed, length: [%d] payload:", fd,
-        bytesRead);
-  TRACE("\n%s", DumpWithAscii(buffer, bytesRead).c_str());
-  return bytesRead;
+  if (result == 0)  // 0 -> peer has performed shutdown
+  {
+    TRACE("Client disconnected, remove accepted FD: [%d]\n",
+          server_accepted_fd_);
+    eventloop_.RemoveFd(server_accepted_fd_);
+    server_accepted_fd_ = -1;
+    return ret;
+  } else if (result < 0) {
+    TRACE("ERROR when read from socket, error: [%d]\n", errno);
+    return ret;
+  }
+  TRACE("Receive from fd: [%d] completed, length: [%d] payload:",
+        server_accepted_fd_, result);
+  TRACE("\n%s", DumpWithAscii(payload, result).c_str());
+
+  ret.insert(ret.begin(), payload, payload + result);
+  return ret;
 }

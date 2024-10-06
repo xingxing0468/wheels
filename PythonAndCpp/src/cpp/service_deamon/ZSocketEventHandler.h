@@ -21,7 +21,8 @@ class ZSocketEventHandler : public IEventHandler {
   void HandleConnect();  // Current always allow connect request, TODO accepted
                          // error handling
   void HandleCall();
-  int ReceiveAllFromSocket(int fd, uint8_t* buffer, int length);
+  std::vector<std::uint8_t> ReceiveAllFromSocket();
+  int SendAllToSocket(const std::vector<std::uint8_t>& data);
 
   std::string server_socket_name_{};
   int server_socket_fd_{-1};
