@@ -15,7 +15,9 @@ class ZSocketServiceProbe(IServiceProbe):
         return True
 
     def RecvServiceResponse(self):
+        MAX_PARAM_SERIALIZED_SIZE = 1024
+        self._out_data = self._socket.recv(MAX_PARAM_SERIALIZED_SIZE)
         return self._out_data
 
     def FlushRecvBuff(self):
-        self._out_data = ''
+        self._out_data = b''

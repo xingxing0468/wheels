@@ -172,6 +172,9 @@ void ZSocketEventHandler::HandleCall() {
   const auto ipc_message{ReceiveAllFromSocket()};
   if (!ipc_message.empty()) {
     const auto result_message = dispatcher_.Dispatch(ipc_message);
+    if (SendAllToSocket(result_message) < 0) {
+      // Error handling?
+    }
   }
 }
 
@@ -212,4 +215,14 @@ std::vector<std::uint8_t> ZSocketEventHandler::ReceiveAllFromSocket() {
 
   ret.insert(ret.begin(), payload, payload + result);
   return ret;
+}
+
+int ZSocketEventHandler::SendAllToSocket(
+    const std::vector<std::uint8_t>& data) {
+  auto sent_bytes =
+      send(server_accepted_fd_, data.data(), data.size(), MSG_DONTWAIT);
+  if (sent_bytes <= 0) {
+    TRACE("ERROR - failed to send ipc response, errno: [%d]", errno);
+  }
+  return 0;
 }

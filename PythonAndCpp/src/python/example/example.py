@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 
 from src.python.service_client.z_service_channel import ZServiceChannel
-from src.python.service_probe.service_probe import ZCExtensionServiceProbe
+from src.python.service_probe.z_c_extension_service_probe import ZCExtensionServiceProbe
+from src.python.service_probe.z_socket_service_probe  import ZSocketServiceProbe
 
 from src.interface.IScrumService_pb2 import Developer
 from src.interface.IScrumService_pb2 import Scrum_Stub
@@ -26,6 +27,6 @@ if __name__ == "__main__":
           EmT(position=PointT(x=21.1, y=22.2), type=EmType.EMTYPE_BUILDING),
           EmT(position=PointT(x=31.1, y=32.2), type=EmType.EMTYPE_CAR)]
 
-    em_service = Em_Stub(ZServiceChannel(ZCExtensionServiceProbe()))
+    em_service = Em_Stub(ZServiceChannel(ZSocketServiceProbe()))
     target_em = em_service.FilterEnv(None, FilterInputT(ems=ps, type=EmType.EMTYPE_CAR), None)
     print("Filter result: {}".format(target_em))
