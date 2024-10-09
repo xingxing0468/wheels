@@ -7,14 +7,13 @@
   * [Example](#example)
   * [Approach](#approach)
   * [NOTE THAT](#note-that)
+* [Integration](#integration)
+  * [Old School](#old-school-homemade-workspace)
+  * [Bazel](#bazel)
 * [Usage](#usage)
   * [Protobuf](#protobuf)
   * [C++](#c)
   * [Python](#python)
-  * [Build](#build)
-* [Integration](#integration)
-  * [Old School](#old-school-homemade-workspace)
-  * [Modern Worksapce](#modern-with-3rd-party-workspace-environmenteg-bazel)
 * [Further development](#further-development)
 
 ## Background
@@ -81,5 +80,31 @@ The this wheel now is based on the version of:
   - .proto file: `proto3`
   - protoc compiler: `libprotoc 27.1` 
 
+## Integration
+### Old School Homemade Workspace
+No longer supported
+
+### Bazel
+Until now this repository has not been registered in the BCR, so we have to use legacy bazel approaches like `new_git_repository` / `http_archive` / `new_local_repository` to integrate this repository as the 3rd party upstream from your bazel workspace.
+
+And with the support of bazel, everything becomes quite simple and straight forward. Just add the 3rd party deps on your own C++ / Python target, then everything is ready to go. For more details just refer to our example repo's [src]().
+
+Note that there is still additional 3rd party dependencies needed even we already put this repo in the upstream, just refer to [WORKSPACE.bzlmod]() and [MODULE.bazel]() in our example repository.
+
 ## Usage
-** WORK IN PROGRESS**
+### Protobuf
+First the protobuf interfaces have to been defined and to be built to support both C++ and Python binding. [proto interfaces]()
+
+### C++
+  - Native implementation of the service we want to support. [Service Impl]()
+  - Implementation of the protobuf service, e.g. some codec between internal data structure and protobuf data structure. [Protobuf service Impl]()
+  - Service factory plugin. Register the protobuf service above and make it visible for the plug-in mechamism. [Service factory plugin]()
+
+### Python
+Already ready to go with the expected plugins and dependencies correctly described in the [BUILD](). In the python file just import the needed modules and call the protobuf interfaces. [example]().
+
+
+## Further Development
+Since the support of real-time interactive python environment with bazel is not suppprted, and with the current cross language the python pachage supported by native bazel it not working anymore, we are now developing another deamon version of the apporaches. It will
+  - Put all the C++ implementation into a servie deamon purely implemented by C++ and can launch independent with `bazel run` for instance.
+  - The caller then becomes a pure python environment and can run independently, we can package the python with the native bazel and to make it runnable in another real-time interactive python environment, e.g. `Jupter` / `IPython`.
