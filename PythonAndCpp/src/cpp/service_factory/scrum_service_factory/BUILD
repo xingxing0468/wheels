@@ -1,3 +1,5 @@
+load("//src/cpp/service_deamon:deploy_service_plugins.bzl", "local_deploy_service_plugin")
+
 cc_library(
     name = "ZScrumServiceFactory",
     srcs = ["ZScrumServiceFactory.cpp"],
@@ -20,4 +22,9 @@ cc_shared_library(
     name = "ZScrumServiceFactoryRunTimePlugin",
     roots = [":ZScrumServiceFactoryRunTimeImpl"],
     visibility = ["//src:__subpackages__"],
+)
+
+local_deploy_service_plugin(
+    plugins = [":ZScrumServiceFactoryRunTimePlugin"],
+    plugins_name = "ScrumServicePlugin",
 )

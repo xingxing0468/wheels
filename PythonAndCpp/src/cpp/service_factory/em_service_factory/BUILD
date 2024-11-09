@@ -1,3 +1,5 @@
+load("//src/cpp/service_deamon:deploy_service_plugins.bzl", "local_deploy_service_plugin")
+
 cc_library(
     name = "ZEmServiceFactory",
     srcs = ["ZEmServiceFactory.cpp"],
@@ -20,4 +22,9 @@ cc_shared_library(
     name = "ZEmServiceFactoryRunTimePlugin",
     roots = [":ZEmServiceFactoryRunTimeImpl"],
     visibility = ["//src:__subpackages__"],
+)
+
+local_deploy_service_plugin(
+    plugins = [":ZEmServiceFactoryRunTimePlugin"],
+    plugins_name = "EmServicePlugin",
 )

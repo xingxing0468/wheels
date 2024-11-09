@@ -24,7 +24,7 @@ int main() {
   g_event_hanlder_ptr = &event_handler;
   signal(SIGINT, SignalHandler);
   service_dispatcher.ResetServiceFactories<ZRuntimeServiceFactoryCollector>(
-      "src/cpp/service_deamon/service_plugins");
+      "/tmp/service_plugins");
   eventloop.Run();
 
   return 0;
