@@ -26,5 +26,3 @@ cc_library(
         "//src/cpp/utils:Trace",
     ],
 )
-
-exports_files(["deploy_plugins.sh"])

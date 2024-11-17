@@ -1,4 +1,4 @@
-load("//src/cpp/service_deamon:deploy_service_plugins.bzl", "local_deploy_service_plugin")
+load("//exports/shell:deploy_service_plugins.bzl", "local_deploy_service_plugin")
 
 cc_library(
     name = "ZScrumServiceFactory",
