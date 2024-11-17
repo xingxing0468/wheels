@@ -6,8 +6,8 @@ from ..package_helper.z_service_package_helper import ZServicePackageHelper
 
 
 class ZServiceChannel(service.RpcChannel):
-    def __init__(self, service_probe):
-        self._service_probe = service_probe
+    def __init__(self, z_c_extension_service_probe):
+        self._service_probe = z_c_extension_service_probe
 
     def CallMethod(
             self,

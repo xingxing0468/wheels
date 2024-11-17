@@ -9,6 +9,7 @@
 
 class ZServiceDispatcher {
  public:
+  static constexpr int MAX_PARAM_SERIALIZED_SIZE = 1024;
   template <class T>
   void ResetServiceFactories(const std::string& service_plugin_path = "") {
     service_factories_.clear();
@@ -22,7 +23,7 @@ class ZServiceDispatcher {
    * Return value:                                                        *
    *  TO BE FILLED                                                        *
    */
-  std::vector<uint8_t> Dispatch(const std::vector<uint8_t>& input_data);
+  std::vector<uint8_t> Dispatch(const std::vector<uint8_t>& input_data) const;
 
  private:
   ServiceFactoryCollectionT service_factories_;

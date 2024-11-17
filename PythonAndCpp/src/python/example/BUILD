@@ -1,15 +1,22 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 
 py_binary(
-    name = "example",
-    srcs = ["example.py"],
+    name = "example_single_process",
+    srcs = ["example_single_process.py"],
     data = [
         ":em_service_plugin",
         ":scrum_service_plugin",
     ],
     deps = [
-        "//src/python/service_client",
-        "//src/python/service_probe",
+        "//src/python/service_channel:local_service_channel",
+    ],
+)
+
+py_binary(
+    name = "example_socket_client",
+    srcs = ["example_socket_client.py"],
+    deps = [
+        "//src/python/service_channel:ipc_service_channel",
     ],
 )
 
