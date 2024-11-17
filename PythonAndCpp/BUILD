@@ -6,13 +6,13 @@ cc_library(
         "exports/cpp",
     ],
     visibility = ["//visibility:public"],
-    deps = ["@zed_python_cpp//exports/cpp:ServicesFactory"],
+    deps = ["@z_python_cpp//exports/cpp:ServicesFactory"],
 )
 
 bzl_library(
     name = "rules_bzl",
     srcs = [
-        "@zed_python_cpp//exports/shell:deploy_service_plugins.bzl",
+        "@z_python_cpp//exports/shell:deploy_service_plugins.bzl",
     ],
     visibility = ["//visibility:public"],
 )
