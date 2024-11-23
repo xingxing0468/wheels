@@ -14,6 +14,8 @@
   * [Protobuf](#protobuf)
   * [C++](#c)
   * [Python](#python)
+      * [Python in Bazel](#python-in-bazel)
+      * [Python StandAlong](#standalong-python-env-like-jupter-or-ipython)
 * [Further development](#further-development)
 
 ## Background
@@ -70,7 +72,9 @@ Then there always comes to the problem that how can we give the codec to convert
 
 ### Approach:
 Here we comes to the idea of the following 2 steps to solve the problem:
-  - Define and implement in this wheel **ONLY ONE** interface between Python / C++ based the native cross programming framework, with whose input and output parameter is only raw binary data blob.
+  - Define and implement in this wheel **ONLY ONE** interface between Python / C++ based on, with what input and output parameter is only raw binary data blob:
+    - the native cross programming framework
+    - Inter process communication, e.g. through local unix socket
   - Find an IDL to supports both Python / C++ bindings, which can help us serialize / deserialize binary data on both Python / C++ side to give us the easy/scalable approach to encode / decode the native / user-defined data structure in Python / C++ with limited effort.
 
 In this wheel, [protobuf](https://github.com/protocolbuffers/protobuf) from google is choosen, which can support most of the requirements.
@@ -82,29 +86,56 @@ The this wheel now is based on the version of:
 
 ## Integration
 ### Old School Homemade Workspace
-No longer supported
+Only supported by the old version [v1_0_0_0_makefile](https://github.com/xingxing0468/wheels/tree/v1_0_0_0_makefile/PythonAndCpp#build)
 
 ### Bazel
 Until now this repository has not been registered in the BCR, so we have to use legacy bazel approaches like `new_git_repository` / `http_archive` / `new_local_repository` to integrate this repository as the 3rd party upstream from your bazel workspace.
 
-And with the support of bazel, everything becomes quite simple and straight forward. Just add the 3rd party deps on your own C++ / Python target, then everything is ready to go. For more details just refer to our example repo's [src]().
+And with the support of bazel, everything becomes quite simple and straight forward. Just add the 3rd party deps on your own C++ / Python target, then everything is ready to go. For more details just refer to our example repo's [bazel src](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/WORKSPACE.bzlmod).
 
-Note that there is still additional 3rd party dependencies needed even we already put this repo in the upstream, just refer to [WORKSPACE.bzlmod]() and [MODULE.bazel]() in our example repository.
+Note that there is still additional 3rd party dependencies needed even we already put this repo in the upstream, just refer to [WORKSPACE.bzlmod](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/WORKSPACE.bzlmod) and [MODULE.bazel](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/MODULE.bazel) in our example repository.
 
 ## Usage
 ### Protobuf
-First the protobuf interfaces have to been defined and to be built to support both C++ and Python binding. [proto interfaces]()
+First the protobuf interfaces have to been defined and to be built to support both C++ and Python binding. [proto interfaces](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/interface)
 
 ### C++
-  - Native implementation of the service we want to support. [Service Impl]()
-  - Implementation of the protobuf service, e.g. some codec between internal data structure and protobuf data structure. [Protobuf service Impl]()
-  - Service factory plugin. Register the protobuf service above and make it visible for the plug-in mechamism. [Service factory plugin]()
+  - Native implementation of the service we want to support. [Service Impl](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/mm)
+  - Implementation of the protobuf service, e.g. some codec between internal data structure and protobuf data structure. [Protobuf service Impl](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/service_implementation/mm_service)
+  - Service factory plugin. Register the protobuf service above and make it visible for the plug-in mechamism. [Service factory plugin](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/service_factory/mm_service_factory/BUILD#L29)
 
 ### Python
-Already ready to go with the expected plugins and dependencies correctly described in the [BUILD](). In the python file just import the needed modules and call the protobuf interfaces. [example]().
+Due to the C++ implementation plugin deployment
+  - With the single process approach, its has to been copied to somewhere and been dynamic loaded in the python, but after deployment, the folder structure deviates from the bazel runfiles, we can not support it in the current version python standalong.
+  - With the python client with service daemon connected by local IPC, the C++ implementation plugins are hardcoded to `/tmp/`, so even in the standalong python environment its possible.
 
+ |                | With bazel | Python standalong |
+ -----------------|------------|-------------------|
+ | Single process |     ✅    |         ❌        |
+ | Via IPC        |     ✅    |         ✅        |
+
+**NOTE THAT**:
+  With the IPC approach, its **MANDATORY** to [deploy the C++ plugins](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/cpp/service_factory/mm_service_factory/BUILD#L29) and launch the service daemon before running the python.
+  ```shell
+bazel run --config=single_process //src/cpp/service_factory/mm_service_factory:MmServicePlugin
+bazel run --config=single_process @z_python_cpp//src/cpp/service_deamon:service_deamon
+  ```
+  If sometime the service deamon failed to launch because of the socket file, just rm the existing one `/tmp/IpcSocket`
+
+#### Python in Bazel
+- [BUILD file](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/python/example/BUILD)
+- [Example code](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/python/example/example.py)
+- [Python tests](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/python/example/test_mm_service.py)
+
+#### Standalong python env like jupter or ipython
+- Build a python zip package first includes all the python dependencies.
+``` shell
+bazel build --config=single_process  //src/python/example:example --build_python_zip
+```
+- Unzip the output zip package into somewhere, e.g. `'/home/zett/python_executable/example`
+- Import the python system path including this folder and the `_main` under it. [Reference here](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/example_bazeless_env.ipynb)
 
 ## Further Development
-Since the support of real-time interactive python environment with bazel is not suppprted, and with the current cross language the python pachage supported by native bazel it not working anymore, we are now developing another deamon version of the apporaches. It will
-  - Put all the C++ implementation into a servie deamon purely implemented by C++ and can launch independent with `bazel run` for instance.
-  - The caller then becomes a pure python environment and can run independently, we can package the python with the native bazel and to make it runnable in another real-time interactive python environment, e.g. `Jupter` / `IPython`.
+Dockerize the service deamon.
+
+
