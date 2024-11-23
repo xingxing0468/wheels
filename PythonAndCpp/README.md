@@ -100,9 +100,9 @@ Note that there is still additional 3rd party dependencies needed even we alread
 First the protobuf interfaces have to been defined and to be built to support both C++ and Python binding. [proto interfaces](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/interface)
 
 ### C++
-  - Native implementation of the service we want to support. [Service Impl](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/service_implementation/mm_service/)
+  - Native implementation of the service we want to support. [Service Impl](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/mm)
   - Implementation of the protobuf service, e.g. some codec between internal data structure and protobuf data structure. [Protobuf service Impl](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/service_implementation/mm_service)
-  - Service factory plugin. Register the protobuf service above and make it visible for the plug-in mechamism. [Service factory plugin]()
+  - Service factory plugin. Register the protobuf service above and make it visible for the plug-in mechamism. [Service factory plugin](https://github.com/xingxing0468/test_python_cpp/tree/v1_2_0_1/src/cpp/service_factory/mm_service_factory/BUILD#L29)
 
 ### Python
 Due to the C++ implementation plugin deployment
@@ -115,12 +115,12 @@ Due to the C++ implementation plugin deployment
  | Via IPC        |     ✅    |         ✅        |
 
 **NOTE THAT**:
-  With the IPC approach, its **MANDATORY** to [deploy the C++ plugins](https://github.com/xingxing0468/test_python_cpp/blob/45c3e17abc94013a3afa432f8486fa7ee262ef26/src/cpp/service_factory/mm_service_factory/BUILD#L29) and launch the service daemon before running the python.
+  With the IPC approach, its **MANDATORY** to [deploy the C++ plugins](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/cpp/service_factory/mm_service_factory/BUILD#L29) and launch the service daemon before running the python.
   ```shell
 bazel run --config=single_process //src/cpp/service_factory/mm_service_factory:MmServicePlugin
 bazel run --config=single_process @z_python_cpp//src/cpp/service_deamon:service_deamon
   ```
-  If sometime the service deamon failed to lunch because of the socket file, just rm the existing one `/tmp/IpcSocket`
+  If sometime the service deamon failed to launch because of the socket file, just rm the existing one `/tmp/IpcSocket`
 
 #### Python in Bazel
 - [BUILD file](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/python/example/BUILD)
@@ -128,7 +128,7 @@ bazel run --config=single_process @z_python_cpp//src/cpp/service_deamon:service_
 - [Python tests](https://github.com/xingxing0468/test_python_cpp/blob/v1_2_0_1/src/python/example/test_mm_service.py)
 
 #### Standalong python env like jupter or ipython
-- Build a python zip package first includes all the python dependence.
+- Build a python zip package first includes all the python dependencies.
 ``` shell
 bazel build --config=single_process  //src/python/example:example --build_python_zip
 ```
