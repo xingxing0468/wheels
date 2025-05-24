@@ -4,4 +4,5 @@ cc_library(
         "IServiceFactory.h",
     ],
     visibility = ["//visibility:public"],
+    deps = ["@com_google_protobuf//:protobuf",]
 )

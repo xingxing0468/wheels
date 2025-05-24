@@ -28,7 +28,8 @@ ZRuntimeServiceFactoryCollector::FetchAvailableServiceFactories(
     }
     void* service_factory_obj = dlopen(file.path().c_str(), RTLD_LAZY);
     if (!service_factory_obj) {
-      TRACE("WARNING: Load lib file: [%s] failed, skip\n", file.path().c_str());
+      TRACE("WARNING: Load lib file: [%s] failed, error: [%s] skip\n",
+            file.path().c_str(), dlerror());
       continue;
     }
 
