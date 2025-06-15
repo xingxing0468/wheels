@@ -173,6 +173,8 @@ void ZSocketEventHandler::HandleCall() {
   if (!ipc_message.empty()) {
     const auto result_message = dispatcher_.Dispatch(ipc_message);
     if (SendAllToSocket(result_message) < 0) {
+      TRACE("ERROR: Failed to send response back to client, fd: [%d]",
+            server_accepted_fd_);
       // Error handling?
     }
   }
@@ -180,8 +182,8 @@ void ZSocketEventHandler::HandleCall() {
 
 std::vector<std::uint8_t> ZSocketEventHandler::ReceiveAllFromSocket() {
   std::vector<std::uint8_t> ret{};
-  std::uint8_t payload[ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE + 1] = {
-      0U};
+  std::vector<std::uint8_t> payload(ZServiceDispatcher::MAX_SIZE_FOR_SEND_RECV,
+                                    0);
 
   bool keep_receiving{true};
   int result{-1};
@@ -189,8 +191,8 @@ std::vector<std::uint8_t> ZSocketEventHandler::ReceiveAllFromSocket() {
   // Since its a local socket and only buffer copy from kernel to userspace
   // with limited payload length, should be OK
   while (keep_receiving) {
-    result = recv(server_accepted_fd_, payload,
-                  ZServiceDispatcher::MAX_PARAM_SERIALIZED_SIZE,
+    result = recv(server_accepted_fd_, payload.data(),
+                  ZServiceDispatcher::MAX_SIZE_FOR_SEND_RECV,
                   MSG_DONTWAIT);  // NON-block
     if (result < 0 && errno == EAGAIN) {
       keep_receiving = true;
@@ -204,25 +206,44 @@ std::vector<std::uint8_t> ZSocketEventHandler::ReceiveAllFromSocket() {
           server_accepted_fd_);
     eventloop_.RemoveFd(server_accepted_fd_);
     server_accepted_fd_ = -1;
-    return ret;
+    return {};
   } else if (result < 0) {
     TRACE("ERROR when read from socket, error: [%d]\n", errno);
-    return ret;
+    return {};
   }
   TRACE("Receive from fd: [%d] completed, length: [%d] payload:",
         server_accepted_fd_, result);
-  TRACE("\n%s", DumpWithAscii(payload, result).c_str());
-
-  ret.insert(ret.begin(), payload, payload + result);
-  return ret;
+  TRACE("\n%s", DumpWithAscii(payload.data(), result).c_str());
+  payload.resize(result);  // Resize to actual received size
+  return payload;
 }
 
 int ZSocketEventHandler::SendAllToSocket(
     const std::vector<std::uint8_t>& data) {
-  auto sent_bytes =
-      send(server_accepted_fd_, data.data(), data.size(), MSG_DONTWAIT);
-  if (sent_bytes <= 0) {
-    TRACE("ERROR - failed to send ipc response, errno: [%d]", errno);
+  auto sent_bytes = 0LU;
+  auto retry_count = 0;
+  auto max_retry_count = 10;
+  auto time_interval_for_retry_in_ms = 100;
+
+  while (sent_bytes < data.size()) {
+    auto next_sent_bytes = send(server_accepted_fd_, data.data() + sent_bytes,
+                                data.size() - sent_bytes, MSG_DONTWAIT);
+    if (next_sent_bytes <= 0) {
+      if (errno == EAGAIN && retry_count < max_retry_count) {
+        // Socket not ready for writing, try again later
+        TRACE("Send would block (EAGAIN), trying again after 100ms, fd: [%d]",
+              server_accepted_fd_);
+        usleep(time_interval_for_retry_in_ms * 1000);  // ms to us
+        ++retry_count;
+        continue;
+      }
+      TRACE("ERROR - failed to send ipc response, errno: [%d]", errno);
+      return -1;
+    }
+    retry_count = 0;
+    sent_bytes += next_sent_bytes;
   }
+  printf("---------- in Send, payload size: [%lu], sent size: [%lu]\n",
+         data.size(), sent_bytes);
   return 0;
 }

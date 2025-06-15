@@ -76,22 +76,24 @@ std::vector<uint8_t> ZServiceDispatcher::Dispatch(
   service_ptr->CallMethod(methodDes, nullptr, request, response, nullptr);
   if (!(response->GetDescriptor() ==
         google::protobuf::Empty::descriptor())) {  // NOT oneway call
-    if (response->ByteSizeLong() > MAX_PARAM_SERIALIZED_SIZE) {
-      // Exceed param serialized size
-      TRACE("ERROR: Exceed param serialized size.\n");
-      cleanup();
-      return ret;
-    }
-    uint8_t buf[MAX_PARAM_SERIALIZED_SIZE];
-    if (!response->SerializeToArray(buf, response->ByteSizeLong())) {
+    // if (response->ByteSizeLong() > MAX_SIZE_FOR_SEND_RECV) {
+    //   // Exceed param serialized size
+    //   TRACE(
+    //       "ERROR: Exceed param serialized size. Limitation: [%u], expected: "
+    //       "[%lu]\n",
+    //       MAX_SIZE_FOR_SEND_RECV, response->ByteSizeLong());
+    //   cleanup();
+    //   return ret;
+    // }
+    std::vector<std::uint8_t> buf;
+    buf.resize(response->ByteSizeLong());
+    if (!response->SerializeToArray(buf.data(), response->ByteSizeLong())) {
       // Serialization failed
       TRACE("ERROR: Output param serialization failed.\n");
       cleanup();
       return ret;
     }
-    ret = ZServicePackage::Pack(
-        service_name, method_id,
-        std::vector<uint8_t>(buf, buf + response->ByteSizeLong()));
+    ret = ZServicePackage::Pack(service_name, method_id, buf);
   }
 
   cleanup();

@@ -9,7 +9,7 @@
 
 class ZServiceDispatcher {
  public:
-  static constexpr int MAX_PARAM_SERIALIZED_SIZE = 1024;
+  static constexpr int MAX_SIZE_FOR_SEND_RECV = 1 * 1024 * 1024;
   template <class T>
   void ResetServiceFactories(const std::string& service_plugin_path = "") {
     service_factories_.clear();
